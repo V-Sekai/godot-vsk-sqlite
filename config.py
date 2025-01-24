@@ -1,6 +1,3 @@
-import subprocess
-
-
 def can_build(env, platform):
     return True
 
@@ -13,6 +10,8 @@ def get_doc_classes():
     return [
         "SQLite",
         "SQLiteQuery",
+        "ResourceFormatLoaderSQLite",
+        "SQLiteDatabase",
     ]
 
 

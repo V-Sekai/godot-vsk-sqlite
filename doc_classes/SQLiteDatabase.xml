@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SQLiteDatabase" inherits="Resource" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Manages SQLite database connections and operations.
+	</brief_description>
+	<description>
+		The SQLiteDatabase class provides functionalities to create, access, and manage SQLite databases within the Godot engine. It allows for executing SQL queries, managing resources, and handling database connections efficiently.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="create" qualifiers="static">
+			<return type="SQLiteDatabase" />
+			<description>
+				Creates a new instance of SQLiteDatabase, initializing the specified database file.
+			</description>
+		</method>
+		<method name="get_sqlite">
+			<return type="SQLite" />
+			<description>
+				Returns the underlying SQLite object for executing queries and operations.
+			</description>
+		</method>
+		<method name="set_resource">
+			<return type="void" />
+			<param index="0" name="path" type="String" />
+			<description>
+				Sets the resource path for the SQLite database file.
+			</description>
+		</method>
+	</methods>
+</class>

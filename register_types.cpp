@@ -30,13 +30,28 @@
 
 #include "register_types.h"
 
+#include "core/io/resource_loader.h"
+#include "core/io/resource_saver.h"
 #include "core/object/class_db.h"
 #include "src/godot_sqlite.h"
+#include "src/resource_loader_sqlite.h"
+#include "src/resource_saver_sqlite.h"
+#include "src/resource_sqlite.h"
+
+static Ref<ResourceFormatLoaderSQLite> sqlite_loader;
+static Ref<ResourceFormatSaverSQLite> sqlite_saver;
 
 void initialize_sqlite_module(ModuleInitializationLevel p_level) {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
 		return;
 	}
+	sqlite_loader.instantiate();
+	sqlite_saver.instantiate();
+	ResourceLoader::add_resource_format_loader(sqlite_loader);
+	ResourceSaver::add_resource_format_saver(sqlite_saver);
+	ClassDB::register_class<ResourceFormatLoaderSQLite>();
+	ClassDB::register_class<ResourceFormatSaverSQLite>();
+	ClassDB::register_class<SQLiteDatabase>();
 	ClassDB::register_class<SQLite>();
 	ClassDB::register_class<SQLiteQuery>();
 }
@@ -44,5 +59,14 @@ void initialize_sqlite_module(ModuleInitializationLevel p_level) {
 void uninitialize_sqlite_module(ModuleInitializationLevel p_level) {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
 		return;
+	}
+
+	if (sqlite_loader != nullptr) {
+		ResourceLoader::remove_resource_format_loader(sqlite_loader);
+		sqlite_loader.unref();
+	}
+	if (sqlite_saver != nullptr) {
+		ResourceSaver::remove_resource_format_saver(sqlite_saver);
+		sqlite_saver.unref();
 	}
 }

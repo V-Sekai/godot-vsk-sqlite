@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ResourceFormatLoaderSQLite" inherits="ResourceFormatLoader" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Loader for SQLite databases.
+	</brief_description>
+	<description>
+		Loader for SQLite databases.
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

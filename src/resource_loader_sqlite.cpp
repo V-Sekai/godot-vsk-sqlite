@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  godot_sqlite.h                                                        */
+/*  resource_loader_sqlite.cpp                                            */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,81 +28,30 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GODOT_SQLITE_H
-#define GODOT_SQLITE_H
+#include "resource_loader_sqlite.h"
 
-#include "core/object/ref_counted.h"
-#include "core/templates/local_vector.h"
-#include "spmemvfs/spmemvfs.h"
-#include "sqlite/sqlite3.h"
+#include "core/config/project_settings.h"
+#include "resource_sqlite.h"
 
-class SQLite;
+Ref<Resource> ResourceFormatLoaderSQLite::load(const String &p_path, const String &p_original_path, Error *r_error, bool p_use_sub_threads, float *r_progress, ResourceFormatLoader::CacheMode p_cache_mode) {
+	Ref<SQLiteDatabase> sqlite_model;
+	sqlite_model.instantiate();
+	sqlite_model->set_resource(p_path);
+	return sqlite_model;
+}
 
-class SQLiteQuery : public RefCounted {
-	GDCLASS(SQLiteQuery, RefCounted);
+void ResourceFormatLoaderSQLite::get_recognized_extensions(List<String> *p_extensions) const {
+	p_extensions->push_back("sqlite");
+}
 
-	SQLite *db = nullptr;
-	sqlite3_stmt *stmt = nullptr;
-	String query;
+bool ResourceFormatLoaderSQLite::handles_type(const String &p_type) const {
+	return p_type == "SQLiteDatabase" || p_type == "Resource";
+}
 
-protected:
-	static void _bind_methods();
-
-public:
-	SQLiteQuery();
-	~SQLiteQuery();
-	void init(SQLite *p_db, const String &p_query);
-	bool is_ready() const;
-	String get_last_error_message() const;
-	Array get_columns();
-	void finalize();
-	Variant execute(const Array p_args);
-	Variant batch_execute(Array p_rows);
-
-private:
-	bool prepare();
-};
-
-class SQLite : public RefCounted {
-	GDCLASS(SQLite, RefCounted);
-
-	friend SQLiteQuery;
-
-private:
-	sqlite3 *db = nullptr;
-	spmemvfs_db_t spmemvfs_db{};
-	bool memory_read = false;
-
-	::LocalVector<WeakRef *, uint32_t, true> queries;
-
-	sqlite3_stmt *prepare(const char *statement);
-	Array fetch_rows(const String &query, const Array &args, int result_type = RESULT_BOTH);
-	sqlite3 *get_handler() const { return memory_read ? spmemvfs_db.handle : db; }
-	Dictionary parse_row(sqlite3_stmt *stmt, int result_type);
-
-public:
-	static bool bind_args(sqlite3_stmt *stmt, const Array &args);
-
-protected:
-	static void _bind_methods();
-
-public:
-	enum { RESULT_BOTH = 0,
-		RESULT_NUM,
-		RESULT_ASSOC };
-
-	SQLite();
-	~SQLite();
-
-	int open(const String &path);
-	int open_in_memory();
-	int open_buffered(const String &name, const PackedByteArray &buffers, int64_t size);
-	int backup(const String &path);
-	int close();
-
-	Ref<SQLiteQuery> create_query(String p_query);
-
-	String get_last_error_message() const;
-	int get_last_error_code() const;
-};
-#endif // GODOT_SQLITE_H
+String ResourceFormatLoaderSQLite::get_resource_type(const String &p_path) const {
+	String extension_lowered = p_path.get_extension().to_lower();
+	if (extension_lowered == "sqlite") {
+		return "SQLiteDatabase";
+	}
+	return String();
+}
