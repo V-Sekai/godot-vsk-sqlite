@@ -11,8 +11,12 @@ def configure(env):
 
 def get_doc_classes():
     return [
-        "SQLite",
+        "SQLiteAccess",
         "SQLiteQuery",
+        "SQLiteQueryResult",
+        "SQLiteDatabase",
+        "SQLiteColumnSchema",
+        "SQLite",
     ]
 
 

@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  register_types.cpp                                                    */
+/*  node_sqlite.cpp                                                       */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,47 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#include "register_types.h"
+#include "node_sqlite.h"
 
-#include "core/object/class_db.h"
-#include "src/godot_sqlite.h"
-#include "src/node_sqlite.h"
-#include "src/resource_loader_sqlite.h"
-#include "src/resource_saver_sqlite.h"
-#include "src/resource_sqlite.h"
-#include "core/io/resource_loader.h"
-#include "core/io/resource_saver.h"
 
-static Ref<ResourceFormatLoaderSQLite> sqlite_loader;
-static Ref<ResourceFormatSaverSQLite> sqlite_saver;
+void SQLite::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("get_database"), &SQLite::get_database);
+    ClassDB::bind_method(D_METHOD("set_database", "database"), &SQLite::set_database);
 
-void initialize_sqlite_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
-		return;
-	}
- 	sqlite_loader.instantiate();
- 	sqlite_saver.instantiate();
- 	ResourceLoader::add_resource_format_loader(sqlite_loader);
- 	ResourceSaver::add_resource_format_saver(sqlite_saver);
-	ClassDB::register_class<SQLiteDatabase>();
-	ClassDB::register_class<SQLiteAccess>();
-	ClassDB::register_class<SQLiteQuery>();
-	ClassDB::register_class<SQLiteQueryResult>();
-	ClassDB::register_class<SQLiteColumnSchema>();
-	ClassDB::register_class<SQLite>();
-}
-
-void uninitialize_sqlite_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
-		return;
-	}
-
-	if (sqlite_loader != nullptr) {
-		ResourceLoader::remove_resource_format_loader(sqlite_loader);
-		sqlite_loader.unref();
-	}
-	if (sqlite_saver != nullptr) {
-		ResourceSaver::remove_resource_format_saver(sqlite_saver);
-		sqlite_saver.unref();
-	}
+    ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "database", PROPERTY_HINT_RESOURCE_TYPE, "SQLiteDatabase"), "set_database", "get_database");
 }

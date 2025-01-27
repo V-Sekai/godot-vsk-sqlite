@@ -10,21 +10,21 @@
 	</tutorials>
 	<methods>
 		<method name="batch_execute">
-			<return type="Variant" />
-			<param index="0" name="rows" type="Array" />
+			<return type="SQLiteQueryResult[]" />
+			<param index="0" name="rows" type="Array[]" />
 			<description>
 				Executes a batch of SQL queries. The queries are provided as an array of strings. Returns the result of the last query in the batch.
 			</description>
 		</method>
 		<method name="execute">
-			<return type="Variant" />
+			<return type="SQLiteQueryResult" />
 			<param index="0" name="arguments" type="Array" default="[]" />
 			<description>
 				Executes a single SQL query. The query is provided as a string. If the query requires arguments, they can be provided as an array. Returns the result of the query.
 			</description>
 		</method>
 		<method name="get_columns">
-			<return type="Array" />
+			<return type="SQLiteColumnSchema[]" />
 			<description>
 				Returns an array of column names from the last executed query.
 			</description>
@@ -36,4 +36,12 @@
 			</description>
 		</method>
 	</methods>
+	<members>
+		<member name="arguments" type="Array" setter="set_arguments" getter="get_arguments" default="[]">
+			Arguments for the query.
+		</member>
+		<member name="query" type="String" setter="" getter="get_query" default="&quot;&quot;">
+			The query executed.
+		</member>
+	</members>
 </class>

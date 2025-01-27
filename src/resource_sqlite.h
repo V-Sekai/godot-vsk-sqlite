@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  register_types.cpp                                                    */
+/*  resource_sqlite.h                                                     */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,47 +28,42 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#include "register_types.h"
+#ifndef SQLITE_RESOURCE_H
+#define SQLITE_RESOURCE_H
 
-#include "core/object/class_db.h"
-#include "src/godot_sqlite.h"
-#include "src/node_sqlite.h"
-#include "src/resource_loader_sqlite.h"
-#include "src/resource_saver_sqlite.h"
-#include "src/resource_sqlite.h"
-#include "core/io/resource_loader.h"
-#include "core/io/resource_saver.h"
+#include "core/io/resource.h"
+#include "core/variant/variant.h"
+#include "godot_sqlite.h"
+#include "core/variant/typed_array.h"
 
-static Ref<ResourceFormatLoaderSQLite> sqlite_loader;
-static Ref<ResourceFormatSaverSQLite> sqlite_saver;
+class SQLiteDatabase : public Resource {
+    GDCLASS(SQLiteDatabase, Resource);
+    Ref<SQLiteAccess> db;
 
-void initialize_sqlite_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
-		return;
-	}
- 	sqlite_loader.instantiate();
- 	sqlite_saver.instantiate();
- 	ResourceLoader::add_resource_format_loader(sqlite_loader);
- 	ResourceSaver::add_resource_format_saver(sqlite_saver);
-	ClassDB::register_class<SQLiteDatabase>();
-	ClassDB::register_class<SQLiteAccess>();
-	ClassDB::register_class<SQLiteQuery>();
-	ClassDB::register_class<SQLiteQueryResult>();
-	ClassDB::register_class<SQLiteColumnSchema>();
-	ClassDB::register_class<SQLite>();
-}
+protected:
+    static void _bind_methods();
 
-void uninitialize_sqlite_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
-		return;
-	}
+public:
+    static Ref<SQLiteDatabase> create();
+    void set_resource(const String &p_path);
+    void set_data(const PackedByteArray &p_data);
+    Ref<SQLiteQuery> create_table(const String &p_table_name, const TypedArray<SQLiteColumnSchema> &p_columns);
+    Ref<SQLiteQuery> drop_table(const String &p_table_name);
 
-	if (sqlite_loader != nullptr) {
-		ResourceLoader::remove_resource_format_loader(sqlite_loader);
-		sqlite_loader.unref();
-	}
-	if (sqlite_saver != nullptr) {
-		ResourceSaver::remove_resource_format_saver(sqlite_saver);
-		sqlite_saver.unref();
-	}
-}
+	Ref<SQLiteQuery> insert_row(const String &p_name, const Dictionary &p_row_dict);
+	Ref<SQLiteQuery> insert_rows(const String &p_name, const TypedArray<Dictionary> &p_row_array);
+
+	Ref<SQLiteQuery> select_rows(const String &p_name, const String &p_conditions);
+	Ref<SQLiteQuery> delete_rows(const String &p_name, const String &p_conditions);
+    Dictionary get_tables() const;
+    TypedArray<SQLiteColumnSchema> get_columns(const String &p_name) const;
+    Ref<SQLiteQuery> create_query(const String &p_query_string, const Array &p_args = Array());
+    Ref<SQLiteQueryResult> execute_query(const String &p_query_string, const Array &p_args = Array());
+	String get_last_error_message() const;
+    int get_last_error_code() const;
+    Ref<SQLiteAccess> get_sqlite();
+
+    SQLiteDatabase();
+    ~SQLiteDatabase();
+};
+#endif // SQLITE_RESOURCE_H

@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  register_types.cpp                                                    */
+/*  node_sqlite.h                                                         */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,47 +28,22 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#include "register_types.h"
+#ifndef NODE_SQLITE_H
+#define NODE_SQLITE_H
 
-#include "core/object/class_db.h"
-#include "src/godot_sqlite.h"
-#include "src/node_sqlite.h"
-#include "src/resource_loader_sqlite.h"
-#include "src/resource_saver_sqlite.h"
-#include "src/resource_sqlite.h"
-#include "core/io/resource_loader.h"
-#include "core/io/resource_saver.h"
+#include "scene/main/node.h"
+#include "resource_sqlite.h"
 
-static Ref<ResourceFormatLoaderSQLite> sqlite_loader;
-static Ref<ResourceFormatSaverSQLite> sqlite_saver;
+class SQLite : public Node {
+	GDCLASS(SQLite, Node);
 
-void initialize_sqlite_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
-		return;
-	}
- 	sqlite_loader.instantiate();
- 	sqlite_saver.instantiate();
- 	ResourceLoader::add_resource_format_loader(sqlite_loader);
- 	ResourceSaver::add_resource_format_saver(sqlite_saver);
-	ClassDB::register_class<SQLiteDatabase>();
-	ClassDB::register_class<SQLiteAccess>();
-	ClassDB::register_class<SQLiteQuery>();
-	ClassDB::register_class<SQLiteQueryResult>();
-	ClassDB::register_class<SQLiteColumnSchema>();
-	ClassDB::register_class<SQLite>();
-}
+private:
+	Ref<SQLiteDatabase> database;
+protected:
+	static void _bind_methods();
 
-void uninitialize_sqlite_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
-		return;
-	}
-
-	if (sqlite_loader != nullptr) {
-		ResourceLoader::remove_resource_format_loader(sqlite_loader);
-		sqlite_loader.unref();
-	}
-	if (sqlite_saver != nullptr) {
-		ResourceSaver::remove_resource_format_saver(sqlite_saver);
-		sqlite_saver.unref();
-	}
-}
+public:
+    Ref<SQLiteDatabase> get_database() { return database; }
+    void set_database(Ref<SQLiteDatabase> p_database) { database = p_database; }
+};
+#endif // NODE_SQLITE_H

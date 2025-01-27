@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  register_types.cpp                                                    */
+/*  resource_loader_sqlite.h                                              */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,47 +28,21 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#include "register_types.h"
+#ifndef RESOURCE_LOADER_SQLITE_H
+#define RESOURCE_LOADER_SQLITE_H
 
-#include "core/object/class_db.h"
-#include "src/godot_sqlite.h"
-#include "src/node_sqlite.h"
-#include "src/resource_loader_sqlite.h"
-#include "src/resource_saver_sqlite.h"
-#include "src/resource_sqlite.h"
 #include "core/io/resource_loader.h"
-#include "core/io/resource_saver.h"
 
-static Ref<ResourceFormatLoaderSQLite> sqlite_loader;
-static Ref<ResourceFormatSaverSQLite> sqlite_saver;
+class ResourceFormatLoaderSQLite : public ResourceFormatLoader {
+    GDCLASS(ResourceFormatLoaderSQLite, ResourceFormatLoader);
 
-void initialize_sqlite_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
-		return;
-	}
- 	sqlite_loader.instantiate();
- 	sqlite_saver.instantiate();
- 	ResourceLoader::add_resource_format_loader(sqlite_loader);
- 	ResourceSaver::add_resource_format_saver(sqlite_saver);
-	ClassDB::register_class<SQLiteDatabase>();
-	ClassDB::register_class<SQLiteAccess>();
-	ClassDB::register_class<SQLiteQuery>();
-	ClassDB::register_class<SQLiteQueryResult>();
-	ClassDB::register_class<SQLiteColumnSchema>();
-	ClassDB::register_class<SQLite>();
-}
+protected:
+    static void _bind_methods() {}
 
-void uninitialize_sqlite_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
-		return;
-	}
-
-	if (sqlite_loader != nullptr) {
-		ResourceLoader::remove_resource_format_loader(sqlite_loader);
-		sqlite_loader.unref();
-	}
-	if (sqlite_saver != nullptr) {
-		ResourceSaver::remove_resource_format_saver(sqlite_saver);
-		sqlite_saver.unref();
-	}
-}
+public:
+    virtual Ref<Resource> load(const String &p_path, const String &p_original_path = "", Error *r_error = nullptr, bool p_use_sub_threads = false, float *r_progress = nullptr, CacheMode p_cache_mode = CACHE_MODE_REUSE) override;
+    virtual void get_recognized_extensions(List<String> *p_extensions) const override;
+    virtual bool handles_type(const String &p_type) const override;
+    virtual String get_resource_type(const String &p_path) const override;
+};
+#endif // RESOURCE_LOADER_SQLITE_H
